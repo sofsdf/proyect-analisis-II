@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Catálogo de Convocatorias{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Convocatorias disponibles</h2>
+
+{% if convocatorias %}
+    <div class="row g-4">
+        {% for conv in convocatorias %}
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ conv.titulo }}</h5>
+                    <p class="card-text">{{ conv.descripcion|truncatewords:25 }}</p>
+                    <p class="text-muted small mb-1"><strong>Requisitos:</strong> {{ conv.requisitos|default:"No especificados" }}</p>
+                    <p class="text-muted small">
+                        <strong>Vigencia:</strong> {{ conv.fecha_inicio }} al {{ conv.fecha_cierre }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info">No hay convocatorias publicadas por el momento.</div>
+{% endif %}
+{% endblock %}
