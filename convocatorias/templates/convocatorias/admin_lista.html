@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Administrar Convocatorias{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Administrar Convocatorias</h2>
+    <a href="{% url 'convocatorias:crear' %}" class="btn btn-primary">+ Nueva Convocatoria</a>
+</div>
+
+{% if convocatorias %}
+<table class="table table-hover bg-white shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Título</th>
+            <th>Vigencia</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for conv in convocatorias %}
+        <tr>
+            <td>{{ conv.titulo }}</td>
+            <td>{{ conv.fecha_inicio }} al {{ conv.fecha_cierre }}</td>
+            <td>
+                {% if conv.publicada %}
+                    <span class="badge bg-success">Publicada</span>
+                {% else %}
+                    <span class="badge bg-secondary">Borrador</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+    <div class="alert alert-info">Todavía no has creado ninguna convocatoria.</div>
+{% endif %}
+{% endblock %}
