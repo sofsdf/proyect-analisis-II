@@ -49,17 +49,16 @@ class CustomLoginView(View):
         return render(request, self.template_name, {'form': form})
 
     def redirigir_por_rol(self, user):
-        """Redirige según el rol asignado al usuario en el sistema."""
+        """Redirección según el rol definido en el sistema."""
         if user.is_superuser or user.rol == Usuario.Rol.ADMIN:
             return redirect('/admin/')
         elif user.rol == Usuario.Rol.EVALUADOR:
             return redirect('evaluador_dashboard')
         else:
-            # Redirección de Estudiante al catálogo
             return redirect('catalogo_convocatorias')
 
 
 def logout_view(request):
     logout(request)
     messages.info(request, "Has cerrado sesión correctamente.")
-    return redirect('login')
+    return redirect('login') 
