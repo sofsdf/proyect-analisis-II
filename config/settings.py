@@ -131,3 +131,5 @@ MAILERS = {
 }
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
+
+LOGIN_URL = 'usuarios:login'
