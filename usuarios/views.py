@@ -6,13 +6,14 @@ from django.views import View
 from .forms import RegistroEstudianteForm
 from .models import Usuario
 
+
 def registro_estudiante(request):
     if request.method == 'POST':
         form = RegistroEstudianteForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, '¡Registro exitoso! Ya puedes iniciar sesión.')
-            return redirect('login')
+            return redirect('usuarios:login')
     else:
         form = RegistroEstudianteForm()
     return render(request, 'usuarios/registro.html', {'form': form})
@@ -52,13 +53,11 @@ class CustomLoginView(View):
         """Redirección según el rol definido en el sistema."""
         if user.is_superuser or user.rol == Usuario.Rol.ADMIN:
             return redirect('/admin/')
-        elif user.rol == Usuario.Rol.EVALUADOR:
-            return redirect('evaluador_dashboard')
         else:
-            return redirect('catalogo_convocatorias')
+            return redirect('convocatorias:catalogo')
 
 
 def logout_view(request):
     logout(request)
     messages.info(request, "Has cerrado sesión correctamente.")
-    return redirect('login') 
+    return redirect('usuarios:login')
