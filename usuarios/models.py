@@ -9,9 +9,10 @@ class Usuario(AbstractUser):
 
     email = models.EmailField('Correo electrónico', unique=True)
     rol = models.CharField(
-        max_length=20, 
-        choices=Rol.choices, 
-        default=Rol.ESTUDIANTE
+        max_length=20,
+        choices=Rol.choices,
+        default=Rol.ESTUDIANTE,
+        verbose_name='Rol'
     )
     carne = models.CharField('Carné / Matrícula', max_length=20, blank=True, null=True, unique=True)
     telefono = models.CharField('Teléfono', max_length=15, blank=True, null=True)
