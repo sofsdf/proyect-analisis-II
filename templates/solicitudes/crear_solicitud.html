@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Postulación a Convocatoria</h4>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title text-muted">{{ convocatoria.titulo }}</h5>
+            <p class="card-text">{{ convocatoria.descripcion }}</p>
+            <hr>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {{ form.as_p }}
+
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-success">Enviar Solicitud</button>
+                <a href="{% url 'convocatorias:catalogo' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
