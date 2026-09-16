@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <div class="alert alert-success p-4 shadow-sm" role="alert">
+        <h3 class="alert-heading">¡Solicitud enviada con éxito!</h3>
+        <p>Tu postulación y el documento PDF fueron registrados correctamente en el sistema.</p>
+        <hr>
+        <a href="{% url 'convocatorias:catalogo' %}" class="btn btn-primary mt-2">Volver a Convocatorias</a>
+    </div>
+</div>
+{% endblock %}
