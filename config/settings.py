@@ -140,3 +140,6 @@ AUTH_USER_MODEL = 'usuarios.Usuario'
 LOGIN_URL = 'usuarios:login'
 
 
+LOGIN_REDIRECT_URL = 'convocatorias:catalogo'
+LOGOUT_REDIRECT_URL = 'usuarios:login'
+

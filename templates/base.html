@@ -12,21 +12,52 @@
 </head>
 <body class="bg-light">
     <!-- Barra de Navegación -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="{% url 'convocatorias:catalogo' %}">Convocatorias</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{% url 'convocatorias:catalogo' %}">Convocatorias</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{% url 'convocatorias:catalogo' %}">Catálogo</a>
+                </li>
+
+                {% if user.is_authenticated %}
+                    {# Si es administrador, ve el botón de gestión #}
+                    {% if user.is_staff %}
                     <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'convocatorias:catalogo' %}">Inicio</a>
+                        <a class="btn btn-warning btn-sm text-dark fw-bold" href="{% url 'convocatorias:admin_lista' %}">
+                            Panel Admin
+                        </a>
                     </li>
-                </ul>
-            </div>
+                    {% endif %}
+
+                    {# Identificación de usuario #}
+                    <li class="nav-item">
+                        <span class="text-light small">
+                            👤 {{ user.username }} {% if user.is_staff %}(Admin){% endif %}
+                        </span>
+                    </li>
+
+                    {# Botón Cerrar Sesión #}
+                    <li class="nav-item">
+                        <form action="{% url 'usuarios:logout' %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Cerrar sesión</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="btn btn-primary btn-sm" href="{% url 'usuarios:login' %}">Iniciar Sesión</a>
+                    </li>
+                {% endif %}
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <!-- Contenedor Principal Dinámico -->
     <main class="container">
