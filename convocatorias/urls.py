@@ -7,4 +7,5 @@ urlpatterns = [
     path('', views.catalogo_convocatorias, name='catalogo'),
     path('admin/', views.lista_convocatorias_admin, name='admin_lista'),
     path('admin/crear/', views.crear_convocatoria, name='crear'),
+    path('admin/editar/<int:pk>/', views.editar_convocatoria, name='editar'),
 ]

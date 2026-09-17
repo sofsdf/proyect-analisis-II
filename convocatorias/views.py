@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
+from django.utils import timezone
 from .models import Convocatoria
 from .forms import ConvocatoriaForm
 
@@ -12,7 +13,11 @@ def es_admin(user):
 # --- Vista para Estudiante: ver catálogo ---
 @login_required
 def catalogo_convocatorias(request):
-    convocatorias = Convocatoria.objects.filter(publicada=True)
+    hoy = timezone.now().date()
+    convocatorias = Convocatoria.objects.filter(
+        publicada=True,
+        fecha_cierre__gte=hoy
+    )
     return render(request, 'convocatorias/catalogo.html', {
         'convocatorias': convocatorias
     })
@@ -43,3 +48,22 @@ def crear_convocatoria(request):
     else:
         form = ConvocatoriaForm()
     return render(request, 'convocatorias/crear.html', {'form': form})
+
+
+# --- Vista para Admin: editar convocatoria existente ---
+@login_required
+@user_passes_test(es_admin)
+def editar_convocatoria(request, pk):
+    convocatoria = get_object_or_404(Convocatoria, pk=pk)
+    if request.method == 'POST':
+        form = ConvocatoriaForm(request.POST, instance=convocatoria)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Convocatoria actualizada correctamente.')
+            return redirect('convocatorias:admin_lista')
+    else:
+        form = ConvocatoriaForm(instance=convocatoria)
+    return render(request, 'convocatorias/editar.html', {
+        'form': form,
+        'convocatoria': convocatoria,
+    })

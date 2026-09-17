@@ -15,6 +15,7 @@
             <th>Título</th>
             <th>Vigencia</th>
             <th>Estado</th>
+            <th class="text-end">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -28,6 +29,9 @@
                 {% else %}
                     <span class="badge bg-secondary">Borrador</span>
                 {% endif %}
+            </td>
+            <td class="text-end">
+                <a href="{% url 'convocatorias:editar' conv.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
             </td>
         </tr>
         {% endfor %}
