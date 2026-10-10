@@ -1,8 +1,8 @@
 from django import forms
-from .models import Solicitud, Documento
+from .models import Solicitud
 
 class SolicitudForm(forms.ModelForm):
-    archivo_pdf = forms.FileField(
+    pdf_requisitos = forms.FileField(
         required=True,
         label="Documento de postulación (PDF)",
         widget=forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': '.pdf'})
@@ -10,10 +10,10 @@ class SolicitudForm(forms.ModelForm):
 
     class Meta:
         model = Solicitud
-        fields = []  # Los campos como estudiante y convocatoria se asignan automáticamente en la vista
+        fields = ['pdf_requisitos']  # Vinculamos el campo directamente con el modelo
 
-    def clean_archivo_pdf(self):
-        archivo = self.cleaned_data.get('archivo_pdf')
+    def clean_pdf_requisitos(self):
+        archivo = self.cleaned_data.get('pdf_requisitos')
         if archivo:
             if not archivo.name.lower().endswith('.pdf'):
                 raise forms.ValidationError("El archivo debe estar en formato PDF.")

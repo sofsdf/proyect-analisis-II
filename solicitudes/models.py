@@ -1,37 +1,46 @@
 from django.db import models
 from django.conf import settings
+from convocatorias.models import Convocatoria
 
 class Solicitud(models.Model):
     ESTADOS = [
-        ('REVISION', 'En Revisión'),
+        ('PENDIENTE', 'Pendiente de Asignación'),
+        ('EN_REVISION', 'En Revisión por Comité'),
         ('APROBADA', 'Aprobada'),
         ('RECHAZADA', 'Rechazada'),
     ]
 
-    # Relaciones (Foreign Keys)
-    estudiante = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='solicitudes')
-    convocatoria = models.ForeignKey('convocatorias.Convocatoria', on_delete=models.CASCADE, related_name='solicitudes')
-    
-    # Atributos
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    estado = models.CharField(max_length=20, choices=ESTADOS, default='REVISION')
-    promedio_actual = models.DecimalField(max_digits=5, decimal_places=2, help_text="Ejemplo: 85.50")
+    # Usamos settings.AUTH_USER_MODEL en lugar de User directamente
+    estudiante = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name='solicitudes'
+    )
+    convocatoria = models.ForeignKey(
+        Convocatoria, 
+        on_delete=models.CASCADE, 
+        related_name='solicitudes'
+    )
+    pdf_requisitos = models.FileField(upload_to='requisitos_pdfs/')
+    fecha_postulacion = models.DateTimeField(auto_now_add=True)
+
+    evaluador = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='solicitudes_asignadas',
+        help_text="Miembro del comité evaluador asignado"
+    )
+    estado = models.CharField(max_length=20, choices=ESTADOS, default='PENDIENTE')
+    observaciones = models.TextField(
+        blank=True, 
+        null=True, 
+        help_text="Resultado y comentarios de la evaluación"
+    )
+
+    class Meta:
+        ordering = ['-fecha_postulacion']
 
     def __str__(self):
-        return f"Solicitud de {self.estudiante.email} - {self.estado}"
-
-
-class Documento(models.Model):
-    TIPOS_DOC = [
-        ('DPI', 'DPI'),
-        ('NOTAS', 'Certificado de Notas'),
-        ('RECIBO', 'Recibo de Servicios'),
-    ]
-
-    solicitud = models.ForeignKey(Solicitud, on_delete=models.CASCADE, related_name='documentos')
-    tipo_documento = models.CharField(max_length=50, choices=TIPOS_DOC)
-    archivo_pdf = models.FileField(upload_to='documentos_solicitudes/')
-    fecha_subida = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.tipo_documento} - Solicitud #{self.solicitud.id}"
+        return f"Solicitud #{self.id} - {self.estudiante} ({self.get_estado_display()})"

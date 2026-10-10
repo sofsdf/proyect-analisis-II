@@ -8,8 +8,8 @@
         <div class="card shadow-sm p-4 mt-4">
             <h2 class="mb-4 text-center">Iniciar Sesión</h2>
 
-            {% if messages %}
-                {% for message in messages %}
+            {% if messages %} 
+               {% for message in messages %}
                     <div class="alert alert-{{ message.tags }}">{{ message }}</div>
                 {% endfor %}
             {% endif %}

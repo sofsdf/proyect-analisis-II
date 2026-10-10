@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Evaluación de Solicitud #{{ solicitud.id }}</h2>
+        <a href="{% url 'solicitudes:lista_solicitudes_comite' %}" class="btn btn-outline-secondary">Volver al Listado</a>
+    </div>
+
+    <div class="row">
+        <!-- Columna Izquierda: Información del Postulante y Visor de PDF -->
+        <div class="col-md-7 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light fw-bold">
+                    Documentación Presentada (PDF)
+                </div>
+                <div class="card-body">
+                    <p><strong>Estudiante:</strong> {{ solicitud.estudiante.username }} ({{ solicitud.estudiante.email }})</p>
+                    <p><strong>Convocatoria:</strong> {{ solicitud.convocatoria.titulo }}</p>
+                    <p><strong>Fecha de Postulación:</strong> {{ solicitud.fecha_postulacion|date:"d/m/Y H:i" }}</p>
+
+                    <hr>
+
+                    {% if solicitud.pdf_requisitos %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold">Visor de Archivo PDF:</span>
+                            <a href="{{ solicitud.pdf_requisitos.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                ↗ Abrir en pestaña nueva / Descargar
+                            </a>
+                        </div>
+                        <div class="border rounded bg-light" style="height: 450px;">
+                            <iframe src="{{ solicitud.pdf_requisitos.url }}" width="100%" height="100%" style="border: none;">
+                                Tu navegador no soporta la visualización directa de archivos PDF.
+                            </iframe>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">No se ha adjuntado ningún documento PDF.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Formulario de Dictamen -->
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white fw-bold">
+                    Dictamen de Evaluación
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="estado" class="form-label fw-bold">Estado de la Solicitud:</label>
+                            <select name="estado" id="estado" class="form-select" required>
+                                <option value="EN_REVISION" {% if solicitud.estado == 'EN_REVISION' %}selected{% endif %}>En Revisión</option>
+                                <option value="APROBADA" {% if solicitud.estado == 'APROBADA' %}selected{% endif %}>Aprobada</option>
+                                <option value="RECHAZADA" {% if solicitud.estado == 'RECHAZADA' %}selected{% endif %}>Rechazada</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="observaciones" class="form-label fw-bold">Observaciones / Motivo:</label>
+                            <textarea name="observaciones" id="observaciones" rows="6" class="form-control" placeholder="Escriba los motivos de la decisión o recomendaciones para el estudiante...">{{ solicitud.observaciones|default_if_none:"" }}</textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                Registrar Dictamen
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

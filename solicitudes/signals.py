@@ -3,20 +3,26 @@ from django.dispatch import receiver
 from .models import Solicitud
 
 @receiver(post_save, sender=Solicitud)
-def notificar_postulacion_creada(sender, instance, created, **kwargs):
-    if created:
-        # Detecta automáticamente el campo de usuario o postulante
-        usuario_relacionado = getattr(instance, 'usuario', None) or \
-                              getattr(instance, 'postulante', None) or \
-                              getattr(instance, 'estudiante', None)
-        
-        nombre_usuario = usuario_relacionado.username if usuario_relacionado else "Estudiante"
-        titulo_convocatoria = getattr(instance.convocatoria, 'titulo', 'Convocatoria')
+def notificar_evento_solicitud(sender, instance, created, **kwargs):
+    """
+    Patrón Observer:
+    - Escucha la señal 'post_save' emitida por el modelo Solicitud.
+    - Se dispara automáticamente tanto al crear (HU-05) como al evaluar (HU-06).
+    """
+    print("\n" + "="*60)
+    print(" [PATRÓN OBSERVER / SIGNAL ACTIVADO]")
 
-        print("\n" + "="*55)
-        print(" [PATRÓN OBSERVER / SIGNAL ACTIVADO]")
-        print(f" Evento: Nueva Solicitud #{instance.pk} guardada en BD")
-        print(f" Postulante notificado: {nombre_usuario}")
-        print(f" Convocatoria: {titulo_convocatoria}")
-        print(" Acción desacoplada: Notificación/correo simulado con éxito.")
-        print("="*55 + "\n")
+    if created:
+        print(f" Evento: Nueva Solicitud #{instance.id} registrada en la BD")
+        print(f" Postulante: {instance.estudiante.username}")
+        print(f" Convocatoria: {instance.convocatoria.titulo}")
+        print(" Acción desacoplada: Simulación de correo de confirmación enviado.")
+    else:
+        print(f" Evento: Dictamen registrado en Solicitud #{instance.id}")
+        print(f" Nuevo Estado: {instance.get_estado_display()}")
+        print(f" Evaluado por: {instance.evaluador.username if instance.evaluador else 'Administrador'}")
+        print(f" Postulante notificado: {instance.estudiante.username}")
+        print(f" Observaciones: {instance.observaciones or 'Sin observaciones'}")
+        print(" Acción desacoplada: Notificación/correo de dictamen enviado con éxito.")
+
+    print("="*60 + "\n")

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Gestión y Evaluación de Solicitudes (Comité)</h2>
+    <p class="text-muted">Consulta las solicitudes presentadas por los estudiantes y gestiona sus evaluaciones.</p>
+
+    
+
+    <div class="card shadow-sm mt-3">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th># ID</th>
+                        <th>Estudiante</th>
+                        <th>Convocatoria</th>
+                        <th>Fecha Postulación</th>
+                        <th>Evaluador Asignado</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for solicitud in solicitudes %}
+                    <tr>
+                        <td><strong>#{{ solicitud.id }}</strong></td>
+                        <td>{{ solicitud.estudiante.username }}</td>
+                        <td>{{ solicitud.convocatoria.titulo }}</td>
+                        <td>{{ solicitud.fecha_postulacion|date:"d/m/Y H:i" }}</td>
+                       <!-- Columna de Evaluador Asignado -->
+<td>
+    {% if request.user.is_staff or request.user.is_superuser %}
+        <!-- Si es Admin: Muestra un dropdown para asignar -->
+        <form action="{% url 'solicitudes:asignar_evaluador' solicitud.id %}" method="POST" class="d-flex align-items-center">
+            {% csrf_token %}
+            <select name="evaluador_id" class="form-select form-select-sm me-1" style="min-width: 120px;">
+                <option value="">Sin Asignar</option>
+                {% for eval in evaluadores %}
+                    <option value="{{ eval.id }}" {% if solicitud.evaluador.id == eval.id %}selected{% endif %}>
+                        {{ eval.username }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-sm btn-outline-success" title="Guardar Asignación">
+                <i class="bi bi-check2"></i> ✔
+            </button>
+        </form>
+    {% else %}
+        <!-- Si es Evaluador: Solo ve su nombre en una badge -->
+        {% if solicitud.evaluador %}
+            <span class="badge bg-secondary">{{ solicitud.evaluador.username }}</span>
+        {% else %}
+            <span class="badge bg-light text-dark">Sin Asignar</span>
+        {% endif %}
+    {% endif %}
+</td>
+                        <td>
+                            {% if solicitud.estado == 'PENDIENTE' %}
+                                <span class="badge bg-warning text-dark">Pendiente</span>
+                            {% elif solicitud.estado == 'EN_REVISION' %}
+                                <span class="badge bg-info text-dark">En Revisión</span>
+                            {% elif solicitud.estado == 'APROBADA' %}
+                                <span class="badge bg-success">Aprobada</span>
+                            {% elif solicitud.estado == 'RECHAZADA' %}
+                                <span class="badge bg-danger">Rechazada</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'solicitudes:evaluar_solicitud' solicitud.id %}" class="btn btn-sm btn-primary">
+                                Evaluar / PDF
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            No hay solicitudes registradas por el momento.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -5,71 +5,129 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Sistema de Convocatorias{% endblock %}</title>
-    <!-- Bootstrap 5 CSS -->
+    <!-- Bootstrap 5 CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Estilos Globales -->
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body { min-height: 100vh; display: flex; flex-direction: column; }
+        .wrapper { display: flex; flex: 1; }
+        #sidebar { min-width: 250px; max-width: 250px; min-height: 100vh; }
+        #sidebar .nav-link { color: #adb5bd; border-radius: 6px; margin-bottom: 4px; }
+        #sidebar .nav-link:hover, #sidebar .nav-link.active { color: #fff; background-color: #0d6efd; }
+        .preview-banner { background-color: #ffc107; color: #000; font-weight: bold; text-align: center; padding: 6px; }
+    </style>
 </head>
 <body class="bg-light">
-    <!-- Barra de Navegación -->
-   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="{% url 'convocatorias:catalogo' %}">Convocatorias</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto align-items-center gap-2">
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="{% url 'convocatorias:catalogo' %}">Catálogo</a>
-                </li>
+    {% if request.session.modo_vista_estudiante %}
+    <!-- Banner Admin vista Estudiante -->
+    <div class="preview-banner d-flex justify-content-between align-items-center px-4">
+        <span> Modo Vista Previa de Estudiante Activo (Estás viendo el sistema como un alumno)</span>
+        <a href="{% url 'usuarios:alternar_vista_previa' %}" class="btn btn-dark btn-sm">
+            Volver a Modo Admin
+        </a>
+    </div>
+    {% endif %}
 
-                {% if user.is_authenticated %}
-                    {# Si es administrador, ve el botón de gestión #}
-                    {% if user.is_staff %}
-                    <li class="nav-item">
-                        <a class="btn btn-warning btn-sm text-dark fw-bold" href="{% url 'convocatorias:admin_lista' %}">
-                            Panel Admin
-                        </a>
-                    </li>
+    <div class="wrapper">
+        <!-- Sidebar Lateral -->
+        <nav id="sidebar" class="bg-dark text-white p-3 d-flex flex-column justify-content-between">
+            <div>
+                <a href="{% url 'convocatorias:catalogo' %}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none fs-5 fw-bold">
+                    <i class="bi bi-mortarboard-fill me-2 text-primary"></i> Convocatorias
+                </a>
+                <hr class="text-secondary">
+
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <!-- Menú Estudiante (o Admin en modo Vista Previa) -->
+                    {% if not user.is_staff or request.session.modo_vista_estudiante %}
+                        <li class="nav-item">
+                            <a href="{% url 'convocatorias:catalogo' %}" class="nav-link text-white">
+                                <i class="bi bi-journal-bookmark-fill me-2"></i> Catálogo Beca
+                            </a>
+                        </li>
                     {% endif %}
 
-                    {# Identificación de usuario #}
-                    <li class="nav-item">
-                        <span class="text-light small">
-                            👤 {{ user.username }} {% if user.is_staff %}(Admin){% endif %}
-                        </span>
-                    </li>
+                    <!-- Menú Exclusivo Administrador-->
+                    {% if user.is_staff and not request.session.modo_vista_estudiante %}
+                        <li class="text-secondary small fw-bold text-uppercase px-2 mt-2 mb-1">Gestión Principal</li>
+                        <li>
+                            <a href="{% url 'solicitudes:lista_solicitudes_comite' %}" class="nav-link text-white">
+                                <i class="bi bi-card-checklist me-2"></i> Evaluar Solicitudes
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'convocatorias:admin_lista' %}" class="nav-link text-white">
+                                <i class="bi bi-megaphone-fill me-2"></i> Convocatorias
+                            </a>
+                        </li>
 
-                    {# Botón Cerrar Sesión #}
-                    <li class="nav-item">
+                        <li class="text-secondary small fw-bold text-uppercase px-2 mt-3 mb-1">Mantenimiento BD</li>
+                        <li>
+                            <a href="/admin/" target="_blank" class="nav-link text-white">
+                                <i class="bi bi-database-gear me-2"></i> Django Admin (BD)
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            <!-- Usuario y Opciones Inferiores -->
+            <div>
+                <hr class="text-secondary">
+                {% if user.is_authenticated %}
+                    {% if user.is_staff %}
+                        <div class="mb-2">
+                            {% if request.session.modo_vista_estudiante %}
+                                <a href="{% url 'usuarios:alternar_vista_previa' %}" class="btn btn-outline-warning btn-sm w-100">
+                                    🛠️ Admin
+                                </a>
+                            {% else %}
+                                <a href="{% url 'usuarios:alternar_vista_previa' %}" class="btn btn-outline-info btn-sm w-100">
+                                    Vista de Usuario
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span class="small text-truncate me-2">
+                            <i class="bi bi-person-circle"></i> {{ user.username }}
+                        </span>
                         <form action="{% url 'usuarios:logout' %}" method="post" class="d-inline">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-outline-danger btn-sm">Cerrar sesión</button>
+                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Cerrar Sesión">
+                                <i class="bi bi-box-arrow-right"></i>
+                            </button>
                         </form>
-                    </li>
+                    </div>
                 {% else %}
-                    <li class="nav-item">
-                        <a class="btn btn-primary btn-sm" href="{% url 'usuarios:login' %}">Iniciar Sesión</a>
-                    </li>
+                    <a href="{% url 'usuarios:login' %}" class="btn btn-primary btn-sm w-100">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
+                    </a>
                 {% endif %}
-            </ul>
-        </div>
-    </div>
-</nav>
+            </div>
+        </nav>
 
-    <!-- Contenedor Principal Dinámico -->
-    <main class="container">
-        {% block content %}
-        <div class="card shadow-sm p-4 mt-4">
-            <h2 class="text-primary">Plantilla Base Conectada</h2>
-            <p class="text-muted">La estructura base de la interfaz y Bootstrap 5 están listos.</p>
-        </div>
-        {% endblock %}
-    </main>
+        <!-- Contenido Principal -->
+        <div class="flex-fill p-4" style="overflow-y: auto;">
+            
+            <!--  SISTEMA DE MENSAJES DE DJANGO -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <!-- FIN SISTEMA DE MENSAJES -->
 
-    <!-- Bootstrap 5 JS -->
+            {% block content %}
+            {% endblock %}
+        </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
