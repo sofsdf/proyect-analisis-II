@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from .models import Solicitud
 from .forms import SolicitudForm
+from .forms_resolucion import ResolucionForm  # HU-07
 from convocatorias.models import Convocatoria  #  importar el modelo de Convocatoria
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -109,4 +110,61 @@ def evaluar_solicitud(request, pk):
 
     return render(request, 'solicitudes/evaluar_solicitud.html', {
         'solicitud': solicitud
+    })
+
+
+# --- VISTAS PARA HU-07 (Resolución final del Administrador) ---
+def es_admin_resolucion(user):
+    return user.is_staff or user.is_superuser
+
+
+@login_required
+@user_passes_test(es_admin_resolucion)
+def lista_resoluciones(request):
+    """
+    HU-07: Lista las solicitudes que el comité ya dictaminó
+    (APROBADA o RECHAZADA) y que aún no tienen resolución final.
+    """
+    base = Solicitud.objects.select_related('estudiante', 'convocatoria', 'evaluador')
+    pendientes = base.filter(
+        estado__in=['APROBADA', 'RECHAZADA'],
+        resolucion_final__isnull=True
+    )
+    resueltas = base.filter(resolucion_final__isnull=False)
+
+    return render(request, 'solicitudes/resoluciones_lista.html', {
+        'pendientes': pendientes,
+        'resueltas': resueltas,
+    })
+
+
+@login_required
+@user_passes_test(es_admin_resolucion)
+def resolver_solicitud(request, pk):
+    """
+    HU-07: El Administrador registra la resolución final.
+    """
+    solicitud = get_object_or_404(
+        Solicitud,
+        pk=pk,
+        estado__in=['APROBADA', 'RECHAZADA'],
+        resolucion_final__isnull=True
+    )
+
+    if request.method == 'POST':
+        form = ResolucionForm(request.POST, instance=solicitud)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request,
+                f"Resolución final registrada para la solicitud #{solicitud.id}: "
+                f"{solicitud.get_resolucion_final_display()}."
+            )
+            return redirect('solicitudes:lista_resoluciones')
+    else:
+        form = ResolucionForm(instance=solicitud)
+
+    return render(request, 'solicitudes/resolver_solicitud.html', {
+        'solicitud': solicitud,
+        'form': form,
     })
