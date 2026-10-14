@@ -39,6 +39,20 @@ class Solicitud(models.Model):
         help_text="Resultado y comentarios de la evaluación"
     )
 
+    # --- HU-07: Resolución final del Administrador ---
+    resolucion_final = models.CharField(
+        max_length=20,
+        choices=[('APROBADA', 'Aprobada'), ('RECHAZADA', 'Rechazada')],
+        null=True,
+        blank=True,
+        help_text="Decisión final del Administrador"
+    )
+    comentarios_admin = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Justificación de la resolución final"
+    )
+
     class Meta:
         ordering = ['-fecha_postulacion']
 

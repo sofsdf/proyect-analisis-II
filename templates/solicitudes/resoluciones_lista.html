@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Resolución Final de Solicitudes</h2>
+    <p class="text-muted">Solicitudes dictaminadas por el comité, pendientes de la decisión final del Administrador.</p>
+
+    <h5 class="mt-4 mb-2">Pendientes de resolver</h5>
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th># ID</th>
+                        <th>Estudiante</th>
+                        <th>Convocatoria</th>
+                        <th>Evaluador</th>
+                        <th>Dictamen del comité</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in pendientes %}
+                    <tr>
+                        <td><strong>#{{ s.id }}</strong></td>
+                        <td>{{ s.estudiante.username }}</td>
+                        <td>{{ s.convocatoria.titulo }}</td>
+                        <td>{{ s.evaluador.username|default:"Sin asignar" }}</td>
+                        <td>
+                            {% if s.estado == 'APROBADA' %}
+                                <span class="badge bg-success">Recomienda aprobar</span>
+                            {% else %}
+                                <span class="badge bg-danger">Recomienda rechazar</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'solicitudes:resolver_solicitud' s.id %}" class="btn btn-sm btn-primary">Resolver</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No hay solicitudes pendientes de resolución.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <h5 class="mt-5 mb-2">Ya resueltas</h5>
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th># ID</th>
+                        <th>Estudiante</th>
+                        <th>Convocatoria</th>
+                        <th>Resolución final</th>
+                        <th>Justificación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in resueltas %}
+                    <tr>
+                        <td><strong>#{{ s.id }}</strong></td>
+                        <td>{{ s.estudiante.username }}</td>
+                        <td>{{ s.convocatoria.titulo }}</td>
+                        <td>
+                            {% if s.resolucion_final == 'APROBADA' %}
+                                <span class="badge bg-success">Aprobada</span>
+                            {% else %}
+                                <span class="badge bg-danger">Rechazada</span>
+                            {% endif %}
+                        </td>
+                        <td class="small">{{ s.comentarios_admin }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">Aún no hay resoluciones registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

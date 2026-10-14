@@ -8,4 +8,7 @@ urlpatterns = [
     path('comite/', views.lista_solicitudes_comite, name='lista_solicitudes_comite'),
     path('evaluar/<int:pk>/', views.evaluar_solicitud, name='evaluar_solicitud'),
     path('asignar/<int:pk>/', views.asignar_evaluador, name='asignar_evaluador'),
+    # HU-07: Resolución final del Administrador
+    path('resoluciones/', views.lista_resoluciones, name='lista_resoluciones'),
+    path('resolver/<int:pk>/', views.resolver_solicitud, name='resolver_solicitud'),
 ]
