@@ -11,4 +11,6 @@ urlpatterns = [
     # HU-07: Resolución final del Administrador
     path('resoluciones/', views.lista_resoluciones, name='lista_resoluciones'),
     path('resolver/<int:pk>/', views.resolver_solicitud, name='resolver_solicitud'),
+    path('mis-solicitudes/', views.mis_solicitudes, name='mis_solicitudes'),
 ]
+

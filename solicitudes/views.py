@@ -168,3 +168,18 @@ def resolver_solicitud(request, pk):
         'solicitud': solicitud,
         'form': form,
     })
+
+
+@login_required
+def mis_solicitudes(request):
+    """
+    HU-08: El estudiante consulta el estado de sus propias solicitudes.
+    """
+    # Filtramos estrictamente por el usuario en sesión por seguridad
+    solicitudes = Solicitud.objects.filter(estudiante=request.user).order_by('-fecha_postulacion')
+    
+    return render(request, 'solicitudes/mis_solicitudes.html', {
+        'solicitudes': solicitudes
+    })
+
+    
