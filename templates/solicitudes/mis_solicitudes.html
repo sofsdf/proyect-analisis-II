@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Mis Solicitudes de Beca</h2>
+    
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th># ID</th>
+                        <th>Convocatoria</th>
+                        <th>Fecha de postulación</th>
+                        <th>Documentos</th>
+                        <th>Estado actual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for solicitud in solicitudes %}
+                    <tr>
+                        <td><strong>#{{ solicitud.id }}</strong></td>
+                        <td>{{ solicitud.convocatoria.titulo }}</td>
+                        <td>{{ solicitud.fecha_postulacion|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if solicitud.pdf_requisitos %}
+                                <a href="{{ solicitud.pdf_requisitos.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    Ver PDF
+                                </a>
+                            {% else %}
+                                <span class="text-muted">Sin documento</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <!-- Lógica de estados: Si no hay resolución del admin, sigue en proceso -->
+                            {% if not solicitud.resolucion_final %}
+                                <span class="badge bg-warning text-dark">En proceso</span>
+                            {% elif solicitud.resolucion_final == 'APROBADA' %}
+                                <span class="badge bg-success">Aprobada</span>
+                            {% else %}
+                                <span class="badge bg-danger">Rechazada</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            Aún no has postulado a ninguna convocatoria.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
