@@ -39,21 +39,45 @@
                 <hr class="text-secondary">
 
                 <ul class="nav nav-pills flex-column mb-auto">
-                    <!-- Menú Estudiante (o Admin en modo Vista Previa) -->
-                    {% if not user.is_staff or request.session.modo_vista_estudiante %}
-                        <li class="nav-item">
-                            <a href="{% url 'convocatorias:catalogo' %}" class="nav-link text-white">
-                                <i class="bi bi-journal-bookmark-fill me-2"></i> Catálogo Beca
-                            </a>
-                        </li>
+                    <!-- Menú Estudiante (Visible para todos) -->
+                    <li class="nav-item">
+                        <a href="{% url 'convocatorias:catalogo' %}" class="nav-link text-white">
+                            <i class="bi bi-journal-bookmark-fill me-2"></i> Catálogo Beca
+                        </a>
+                    </li>
+                    {% if user.is_authenticated and not user.is_staff %}
+                    <li class="nav-item">
+                        <a href="{% url 'solicitudes:mis_solicitudes' %}" class="nav-link text-white">
+                            <i class="bi bi-file-earmark-person me-2"></i> Mis Solicitudes
+                        </a>
+                    </li>
                     {% endif %}
 
-                    <!-- Menú Exclusivo Administrador-->
+                    <!-- Menú Exclusivo Evaluador (Chequea si pertenece al grupo) -->
+                    {% if user.is_authenticated %}
+                        {% for group in user.groups.all %}
+                            {% if group.name == 'ComiteEvaluador' %}
+                                <li class="text-secondary small fw-bold text-uppercase px-2 mt-3 mb-1">Comité</li>
+                                <li>
+                                    <a href="{% url 'solicitudes:lista_solicitudes_comite' %}" class="nav-link text-white">
+                                        <i class="bi bi-card-checklist me-2"></i> Evaluar Solicitudes
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Menú Exclusivo Administrador/DBA -->
                     {% if user.is_staff and not request.session.modo_vista_estudiante %}
-                        <li class="text-secondary small fw-bold text-uppercase px-2 mt-2 mb-1">Gestión Principal</li>
+                        <li class="text-secondary small fw-bold text-uppercase px-2 mt-3 mb-1">Administración</li>
                         <li>
                             <a href="{% url 'solicitudes:lista_solicitudes_comite' %}" class="nav-link text-white">
                                 <i class="bi bi-card-checklist me-2"></i> Evaluar Solicitudes
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'solicitudes:lista_resoluciones' %}" class="nav-link text-white">
+                                <i class="bi bi-check2-square me-2"></i> Resoluciones Finales
                             </a>
                         </li>
                         <li>

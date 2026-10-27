@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-from .models import Solicitud
+from .models import Solicitud, AuditoriaSolicitud
 from .forms import SolicitudForm
 from .forms_resolucion import ResolucionForm  # HU-07
-from convocatorias.models import Convocatoria  #  importar el modelo de Convocatoria
+from convocatorias.models import Convocatoria  # importar el modelo de Convocatoria
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -102,8 +102,15 @@ def evaluar_solicitud(request, pk):
             solicitud.evaluador = request.user  # Asigna al usuario actual como evaluador
             solicitud.save()  # <--- Patrón Observer en signals.py!
 
+            # --- NUEVO CÓDIGO DE AUDITORÍA ---
+            AuditoriaSolicitud.objects.create(
+                solicitud=solicitud,
+                usuario=request.user,
+                accion=f"Evaluación: cambió el estado a {nuevo_estado}"
+            )
+            # ---------------------------------
+
             messages.success(request, f"La solicitud #{solicitud.id} fue actualizada a estado '{solicitud.get_estado_display()}' con éxito.")
-            # corrigí agregando el namespace 'solicitudes:'
             return redirect('solicitudes:lista_solicitudes_comite') 
         else:
             messages.error(request, "Estado no válido seleccionado.")
@@ -155,6 +162,15 @@ def resolver_solicitud(request, pk):
         form = ResolucionForm(request.POST, instance=solicitud)
         if form.is_valid():
             form.save()
+
+            # --- NUEVO CÓDIGO DE AUDITORÍA ---
+            AuditoriaSolicitud.objects.create(
+                solicitud=solicitud,
+                usuario=request.user,
+                accion=f"Resolución Admin: registró resolución final como {solicitud.resolucion_final}"
+            )
+            # ---------------------------------
+
             messages.success(
                 request,
                 f"Resolución final registrada para la solicitud #{solicitud.id}: "
@@ -181,5 +197,3 @@ def mis_solicitudes(request):
     return render(request, 'solicitudes/mis_solicitudes.html', {
         'solicitudes': solicitudes
     })
-
-    

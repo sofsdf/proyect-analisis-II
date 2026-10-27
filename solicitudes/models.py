@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from convocatorias.models import Convocatoria
+from django.contrib.auth import get_user_model
 
 class Solicitud(models.Model):
     ESTADOS = [
@@ -58,3 +59,12 @@ class Solicitud(models.Model):
 
     def __str__(self):
         return f"Solicitud #{self.id} - {self.estudiante} ({self.get_estado_display()})"
+
+class AuditoriaSolicitud(models.Model):
+    solicitud = models.ForeignKey(Solicitud, on_delete=models.CASCADE, related_name='historial_cambios')
+    usuario = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True)
+    accion = models.CharField(max_length=255)
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.usuario.username} - {self.accion} - {self.fecha.strftime('%d/%m/%Y %H:%M')}"
