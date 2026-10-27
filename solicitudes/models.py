@@ -40,6 +40,14 @@ class Solicitud(models.Model):
         help_text="Resultado y comentarios de la evaluación"
     )
 
+    # --- NUEVO: Requerimiento de aprobación para montos mayores a Q10,000 ---
+    monto_solicitado = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        default=0.00,
+        help_text="Monto de la beca solicitada. Si supera Q10,000 requiere doble aprobación."
+    )
+
     # --- HU-07: Resolución final del Administrador ---
     resolucion_final = models.CharField(
         max_length=20,
