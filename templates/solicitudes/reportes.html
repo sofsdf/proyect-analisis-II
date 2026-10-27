@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard de Estadísticas{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-wrapper {
+        padding: 2rem;
+    }
+
+    .float-card {
+        background: #ffffff;
+        border: none;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .float-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .accent-total {
+        border-bottom: 4px solid #8a2be2;
+    }
+
+    .accent-aprobadas {
+        border-bottom: 4px solid #00bfff;
+    }
+
+    .accent-rechazadas {
+        border-bottom: 4px solid #dc143c;
+    }
+
+    .accent-pendientes {
+        border-bottom: 4px solid #ff8c00;
+    }
+
+    .metric-title {
+        font-size: 0.85rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #6c757d;
+        font-weight: 700;
+    }
+
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #2b2b2b;
+        margin: 10px 0 0 0;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="dashboard-wrapper">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark" style="letter-spacing: 1px;">Métricas del Sistema</h2>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-xl-3 col-md-6">
+            <div class="float-card accent-total h-100 p-4 text-center">
+                <p class="metric-title">Total Solicitudes</p>
+                <h1 class="metric-value">{{ total }}</h1>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="float-card accent-aprobadas h-100 p-4 text-center">
+                <p class="metric-title">Aprobadas</p>
+                <h1 class="metric-value">{{ aprobadas }}</h1>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="float-card accent-rechazadas h-100 p-4 text-center">
+                <p class="metric-title">Rechazadas</p>
+                <h1 class="metric-value">{{ rechazadas }}</h1>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="float-card accent-pendientes h-100 p-4 text-center">
+                <p class="metric-title">En Revisión</p>
+                <h1 class="metric-value">{{ pendientes }}</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="float-card p-4">
+                <h5 class="fw-bold text-center mb-4" style="color: #4a4a4a;">Distribución de Estados</h5>
+                <div class="chart-container">
+                    <canvas id="donutChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="float-card p-4">
+                <h5 class="fw-bold text-center mb-4" style="color: #4a4a4a;">Comparativa de Solicitudes</h5>
+                <div class="chart-container">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const aprobadas = parseInt("{{ aprobadas|default:0 }}", 10);
+        const rechazadas = parseInt("{{ rechazadas|default:0 }}", 10);
+        const pendientes = parseInt("{{ pendientes|default:0 }}", 10);
+
+        const etiquetas = ['Aprobadas', 'Rechazadas', 'En Revisión'];
+        const datos = [aprobadas, rechazadas, pendientes];
+        const coloresPersonalizados = ['#00bfff', '#dc143c', '#ff8c00'];
+
+        const ctxDonut = document.getElementById('donutChart').getContext('2d');
+        new Chart(ctxDonut, {
+            type: 'doughnut',
+            data: {
+                labels: etiquetas,
+                datasets: [{
+                    data: datos,
+                    backgroundColor: coloresPersonalizados,
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: etiquetas,
+                datasets: [{
+                    label: 'Cantidad',
+                    data: datos,
+                    backgroundColor: coloresPersonalizados,
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 } 
+                    }
+                },
+                plugins: {
+                    legend: { display: false } 
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

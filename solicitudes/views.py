@@ -197,3 +197,18 @@ def mis_solicitudes(request):
     return render(request, 'solicitudes/mis_solicitudes.html', {
         'solicitudes': solicitudes
     })
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def dashboard_reportes(request):
+    total = Solicitud.objects.count()
+    aprobadas = Solicitud.objects.filter(estado='APROBADA').count()
+    rechazadas = Solicitud.objects.filter(estado='RECHAZADA').count()
+    pendientes = Solicitud.objects.filter(estado='REVISION').count()
+
+    return render(request, 'solicitudes/reportes.html', {
+        'total': total,
+        'aprobadas': aprobadas,
+        'rechazadas': rechazadas,
+        'pendientes': pendientes
+    })
