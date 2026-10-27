@@ -27,7 +27,7 @@ def crear_solicitud(request, convocatoria_id):
             solicitud.save()
             
             messages.success(request, '¡Tu solicitud ha sido enviada con éxito!')
-            return redirect('convocatorias:catalogo')  # Te regresa al catálogo tras postularse
+            return redirect('convocatorias:catalogo')  # regresa al catálogo tras postularse
     else:
         form = SolicitudForm()
         
@@ -204,7 +204,7 @@ def dashboard_reportes(request):
     total = Solicitud.objects.count()
     aprobadas = Solicitud.objects.filter(estado='APROBADA').count()
     rechazadas = Solicitud.objects.filter(estado='RECHAZADA').count()
-    pendientes = Solicitud.objects.filter(estado='REVISION').count()
+    pendientes = Solicitud.objects.filter(estado='EN_REVISION').count()
 
     return render(request, 'solicitudes/reportes.html', {
         'total': total,
