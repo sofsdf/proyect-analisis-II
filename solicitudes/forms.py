@@ -2,6 +2,19 @@ from django import forms
 from .models import Solicitud
 
 class SolicitudForm(forms.ModelForm):
+    monto_solicitado = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        required=True,
+        label="Monto Solicitado (Q)",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ej. 12000.00',
+            'min': '0',
+            'step': '0.01'
+        })
+    )
+
     pdf_requisitos = forms.FileField(
         required=True,
         label="Documento de postulación (PDF)",
@@ -10,7 +23,7 @@ class SolicitudForm(forms.ModelForm):
 
     class Meta:
         model = Solicitud
-        fields = ['pdf_requisitos']  # Vinculamos el campo directamente con el modelo
+        fields = ['monto_solicitado', 'pdf_requisitos']  # Incluye el monto y el archivo PDF
 
     def clean_pdf_requisitos(self):
         archivo = self.cleaned_data.get('pdf_requisitos')

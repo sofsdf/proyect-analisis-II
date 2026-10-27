@@ -15,6 +15,7 @@
                         <th># ID</th>
                         <th>Estudiante</th>
                         <th>Convocatoria</th>
+                        <th>Monto Solicitado</th>
                         <th>Fecha Postulación</th>
                         <th>Evaluador Asignado</th>
                         <th>Estado</th>
@@ -27,6 +28,7 @@
                         <td><strong>#{{ solicitud.id }}</strong></td>
                         <td>{{ solicitud.estudiante.username }}</td>
                         <td>{{ solicitud.convocatoria.titulo }}</td>
+                        <td>Q{{ solicitud.monto_solicitado|default:"0.00" }}</td>
                         <td>{{ solicitud.fecha_postulacion|date:"d/m/Y H:i" }}</td>
                        <!-- Columna de Evaluador Asignado -->
 <td>
@@ -74,7 +76,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="text-center py-4 text-muted">
+                        <td colspan="8" class="text-center py-4 text-muted">
                             No hay solicitudes registradas por el momento.
                         </td>
                     </tr>
