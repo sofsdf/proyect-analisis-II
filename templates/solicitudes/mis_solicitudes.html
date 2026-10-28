@@ -4,6 +4,29 @@
 <div class="container mt-4">
     <h2 class="mb-4">Mis Solicitudes de Beca</h2>
     
+    <!-- SECCIÓN DE NOTIFICACIONES AL ESTUDIANTE (HU-08 / Tarea de Samuel) -->
+    <div class="mb-4">
+        {% for solicitud in solicitudes %}
+            {% if not solicitud.resolucion_final %}
+                <div class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert">
+                    <strong>⏳ En proceso:</strong> Tu solicitud <strong>#{{ solicitud.id }}</strong> para la convocatoria <em>"{{ solicitud.convocatoria.titulo }}"</em> ha sido recibida y está siendo evaluada.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% elif solicitud.resolucion_final == 'APROBADA' %}
+                <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                    <strong>🎉 ¡Aprobada!</strong> Felicidades, tu solicitud <strong>#{{ solicitud.id }}</strong> para la convocatoria <em>"{{ solicitud.convocatoria.titulo }}"</em> ha sido aceptada.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% else %}
+                <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                    <strong>❌ Rechazada:</strong> Lo sentimos, tu solicitud <strong>#{{ solicitud.id }}</strong> para la convocatoria <em>"{{ solicitud.convocatoria.titulo }}"</em> no fue aprobada en esta ocasión.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <!-- FIN SECCIÓN DE NOTIFICACIONES -->
+
     <div class="card shadow-sm">
         <div class="card-body p-0">
             <table class="table table-hover align-middle mb-0">
@@ -32,7 +55,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            <!-- Lógica de estados: Si no hay resolución del admin, sigue en proceso -->
+                            <!-- Lógica de estados para las etiquetas (badges) de la tabla -->
                             {% if not solicitud.resolucion_final %}
                                 <span class="badge bg-warning text-dark">En proceso</span>
                             {% elif solicitud.resolucion_final == 'APROBADA' %}
