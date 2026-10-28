@@ -21,20 +21,23 @@
             flex: 1;
         }
 
+        /* Sidebar para Escritorio */
         #sidebar {
             min-width: 250px;
             max-width: 250px;
             min-height: 100vh;
         }
 
-        #sidebar .nav-link {
+        #sidebar .nav-link, .offcanvas-body .nav-link {
             color: #adb5bd;
             border-radius: 6px;
             margin-bottom: 4px;
         }
 
         #sidebar .nav-link:hover,
-        #sidebar .nav-link.active {
+        #sidebar .nav-link.active,
+        .offcanvas-body .nav-link:hover,
+        .offcanvas-body .nav-link.active {
             color: #fff;
             background-color: #0d6efd;
         }
@@ -53,17 +56,27 @@
 
     {% if request.session.modo_vista_estudiante %}
     <!-- Banner Admin vista Estudiante -->
-    <div class="preview-banner d-flex justify-content-between align-items-center px-4">
-        <span> Modo Vista Previa de Estudiante Activo (Estás viendo el sistema como un alumno)</span>
-        <a href="{% url 'usuarios:alternar_vista_previa' %}" class="btn btn-dark btn-sm">
-            Volver a Modo Admin
+    <div class="preview-banner d-flex justify-content-between align-items-center px-3 px-md-4">
+        <span class="small fw-bold">Modo Vista Previa de Estudiante Activo</span>
+        <a href="{% url 'usuarios:alternar_vista_previa' %}" class="btn btn-dark btn-sm ms-2">
+            Volver a Admin
         </a>
     </div>
     {% endif %}
 
+    <!-- NAVBAR SUPERIOR PARA MÓVILES (Visible únicamente en celulares < 768px) -->
+    <nav class="navbar navbar-dark bg-dark d-md-none px-3 border-bottom border-secondary">
+        <a class="navbar-brand fw-bold fs-6" href="{% url 'convocatorias:catalogo' %}">
+            <i class="bi bi-mortarboard-fill text-primary me-2"></i> Convocatorias
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </nav>
+
     <div class="wrapper">
-        <!-- Sidebar Lateral -->
-        <nav id="sidebar" class="bg-dark text-white p-3 d-flex flex-column justify-content-between">
+        <!-- Sidebar Lateral ESCRITORIO (Oculto en móvil) -->
+        <nav id="sidebar" class="bg-dark text-white p-3 d-none d-md-flex flex-column justify-content-between">
             <div>
                 <a href="{% url 'convocatorias:catalogo' %}"
                     class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none fs-5 fw-bold">
@@ -72,7 +85,7 @@
                 <hr class="text-secondary">
 
                 <ul class="nav nav-pills flex-column mb-auto">
-                    <!-- Menú Estudiante (Visible para todos) -->
+                    <!-- Menú Estudiante -->
                     <li class="nav-item">
                         <a href="{% url 'convocatorias:catalogo' %}" class="nav-link text-white">
                             <i class="bi bi-journal-bookmark-fill me-2"></i> Catálogo Beca
@@ -86,7 +99,7 @@
                     </li>
                     {% endif %}
 
-                    <!-- Menú Exclusivo Evaluador (Chequea si pertenece al grupo) -->
+                    <!-- Menú Exclusivo Evaluador -->
                     {% if user.is_authenticated %}
                     {% for group in user.groups.all %}
                     {% if group.name == 'ComiteEvaluador' %}
@@ -104,14 +117,14 @@
                     {% if user.is_staff and not request.session.modo_vista_estudiante %}
                     <li class="text-secondary small fw-bold text-uppercase px-2 mt-3 mb-1">Administración</li>
                     <li>
-                    <li>
                         <a href="{% url 'solicitudes:reportes' %}" class="nav-link text-white">
                             <i class="bi bi-bar-chart-fill me-2"></i> Estadísticas
                         </a>
                     </li>
-                    <a href="{% url 'solicitudes:lista_solicitudes_comite' %}" class="nav-link text-white">
-                        <i class="bi bi-card-checklist me-2"></i> Evaluar Solicitudes
-                    </a>
+                    <li>
+                        <a href="{% url 'solicitudes:lista_solicitudes_comite' %}" class="nav-link text-white">
+                            <i class="bi bi-card-checklist me-2"></i> Evaluar Solicitudes
+                        </a>
                     </li>
                     <li>
                         <a href="{% url 'solicitudes:lista_resoluciones' %}" class="nav-link text-white">
@@ -153,8 +166,8 @@
                 {% endif %}
 
                 <div class="d-flex align-items-center justify-content-between">
-                    <span class="small text-truncate me-2">
-                        <i class="bi bi-person-circle"></i> {{ user.username }}
+                    <span class="small text-truncate me-2 text-white">
+                        <i class="bi bi-person-circle me-1"></i> {{ user.username }}
                     </span>
                     <form action="{% url 'usuarios:logout' %}" method="post" class="d-inline">
                         {% csrf_token %}
@@ -171,10 +184,117 @@
             </div>
         </nav>
 
-        <!-- Contenido Principal -->
-        <div class="flex-fill p-4" style="overflow-y: auto;">
+        <!-- Sidebar Deslizable OFFCANVAS MÓVIL -->
+        <div class="offcanvas offcanvas-start bg-dark text-white d-md-none" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
+            <div class="offcanvas-header border-bottom border-secondary">
+                <h5 class="offcanvas-title fw-bold" id="mobileSidebarLabel">
+                    <i class="bi bi-mortarboard-fill text-primary me-2"></i> Convocatorias
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body d-flex flex-column justify-content-between">
+                <div>
+                    <ul class="nav nav-pills flex-column mb-auto">
+                        <li class="nav-item">
+                            <a href="{% url 'convocatorias:catalogo' %}" class="nav-link text-white">
+                                <i class="bi bi-journal-bookmark-fill me-2"></i> Catálogo Beca
+                            </a>
+                        </li>
+                        {% if user.is_authenticated and not user.is_staff %}
+                        <li class="nav-item">
+                            <a href="{% url 'solicitudes:mis_solicitudes' %}" class="nav-link text-white">
+                                <i class="bi bi-file-earmark-person me-2"></i> Mis Solicitudes
+                            </a>
+                        </li>
+                        {% endif %}
 
-            <!--  SISTEMA DE MENSAJES DE DJANGO -->
+                        {% if user.is_authenticated %}
+                        {% for group in user.groups.all %}
+                        {% if group.name == 'ComiteEvaluador' %}
+                        <li class="text-secondary small fw-bold text-uppercase px-2 mt-3 mb-1">Comité</li>
+                        <li>
+                            <a href="{% url 'solicitudes:lista_solicitudes_comite' %}" class="nav-link text-white">
+                                <i class="bi bi-card-checklist me-2"></i> Evaluar Solicitudes
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+
+                        {% if user.is_staff and not request.session.modo_vista_estudiante %}
+                        <li class="text-secondary small fw-bold text-uppercase px-2 mt-3 mb-1">Administración</li>
+                        <li>
+                            <a href="{% url 'solicitudes:reportes' %}" class="nav-link text-white">
+                                <i class="bi bi-bar-chart-fill me-2"></i> Estadísticas
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'solicitudes:lista_solicitudes_comite' %}" class="nav-link text-white">
+                                <i class="bi bi-card-checklist me-2"></i> Evaluar Solicitudes
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'solicitudes:lista_resoluciones' %}" class="nav-link text-white">
+                                <i class="bi bi-check2-square me-2"></i> Resoluciones Finales
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'convocatorias:admin_lista' %}" class="nav-link text-white">
+                                <i class="bi bi-megaphone-fill me-2"></i> Convocatorias
+                            </a>
+                        </li>
+
+                        <li class="text-secondary small fw-bold text-uppercase px-2 mt-3 mb-1">Mantenimiento BD</li>
+                        <li>
+                            <a href="/admin/" target="_blank" class="nav-link text-white">
+                                <i class="bi bi-database-gear me-2"></i> Django Admin (BD)
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <div>
+                    <hr class="text-secondary">
+                    {% if user.is_authenticated %}
+                    {% if user.is_staff %}
+                    <div class="mb-2">
+                        {% if request.session.modo_vista_estudiante %}
+                        <a href="{% url 'usuarios:alternar_vista_previa' %}" class="btn btn-outline-warning btn-sm w-100">
+                            🛠️ Admin
+                        </a>
+                        {% else %}
+                        <a href="{% url 'usuarios:alternar_vista_previa' %}" class="btn btn-outline-info btn-sm w-100">
+                            Vista de Usuario
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span class="small text-truncate me-2 text-white">
+                            <i class="bi bi-person-circle me-1"></i> {{ user.username }}
+                        </span>
+                        <form action="{% url 'usuarios:logout' %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Cerrar Sesión">
+                                <i class="bi bi-box-arrow-right"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'usuarios:login' %}" class="btn btn-primary btn-sm w-100">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido Principal -->
+        <div class="flex-fill p-3 p-md-4" style="overflow-y: auto;">
+
+            <!-- SISTEMA DE MENSAJES DE DJANGO -->
             {% if messages %}
             {% for message in messages %}
             <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm"
@@ -184,14 +304,15 @@
             </div>
             {% endfor %}
             {% endif %}
-            <!-- FIN SISTEMA DE MENSAJES -->
 
             {% block content %}
+            {% block content_body %}{% endblock %}
             {% endblock %}
         </div>
+    </div>
 
-        <!-- Bootstrap 5 JS Bundle -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

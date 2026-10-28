@@ -1,32 +1,80 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block title %}Iniciar Sesión{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card shadow-sm p-4 mt-4">
-            <h2 class="mb-4 text-center">Iniciar Sesión</h2>
-
-            {% if messages %} 
-               {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-
-            <form method="post" novalidate>
-                {% csrf_token %}
-                {% for field in form %}
-                <div class="mb-3">
-                    <label class="form-label fw-bold">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}
-                        <div class="text-danger small">{{ field.errors }}</div>
-                    {% endif %}
+<div class="container py-4">
+    <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4">
+            
+            <!-- TARJETA MODERNA -->
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                
+                <!-- Encabezado con degradado e icono -->
+                <div class="bg-primary bg-gradient text-white text-center py-4 px-3">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-white text-primary rounded-circle shadow-sm mb-2" style="width: 58px; height: 58px; font-size: 1.8rem;">
+                        🎓
+                    </div>
+                    <h4 class="fw-bold mb-0 fs-4">Sistema de Becas</h4>
+                    <p class="text-white-50 small mb-0">Portal de Acceso Unificado</p>
                 </div>
-                {% endfor %}
-                <button type="submit" class="btn btn-primary w-100">Entrar</button>
-            </form>
+
+                <!-- Cuerpo del Formulario -->
+                <div class="card-body p-4 p-sm-5">
+                    <h5 class="fw-bold text-dark text-center mb-1">¡Bienvenido/a!</h5>
+                    <p class="text-muted text-center small mb-4">Ingresa tus credenciales para continuar</p>
+
+                    <!-- Mensajes de Django -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show py-2 px-3 small border-0 shadow-sm mb-3" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.75rem;"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger alert-dismissible fade show py-2 px-3 small border-0 shadow-sm mb-4" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                            Credenciales inválidas. Revisa los datos.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.75rem;"></button>
+                        </div>
+                    {% endif %}
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Campo Usuario -->
+                        <div class="form-floating mb-3">
+                            <input type="text" name="username" class="form-control rounded-3" id="floatingUsername" placeholder="Usuario" required autofocus>
+                            <label for="floatingUsername" class="text-muted">
+                                <i class="bi bi-person me-2"></i>Nombre de usuario
+                            </label>
+                        </div>
+
+                        <!-- Campo Contraseña -->
+                        <div class="form-floating mb-4">
+                            <input type="password" name="password" class="form-control rounded-3" id="floatingPassword" placeholder="Contraseña" required>
+                            <label for="floatingPassword" class="text-muted">
+                                <i class="bi bi-lock me-2"></i>Contraseña
+                            </label>
+                        </div>
+
+                        <!-- Botón de Iniciar Sesión -->
+                        <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-3 fw-bold text-uppercase shadow-sm">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Pie de tarjeta -->
+                <div class="card-footer bg-light text-center py-3 border-0">
+                    <span class="text-muted small">Nymbus Systems &copy; 2026</span>
+                </div>
+
+            </div>
+
         </div>
     </div>
 </div>
