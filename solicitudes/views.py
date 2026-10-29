@@ -6,6 +6,7 @@ from .forms import SolicitudForm
 from .forms_resolucion import ResolucionForm  # HU-07
 from convocatorias.models import Convocatoria  # importar el modelo de Convocatoria
 from django.contrib.auth import get_user_model
+from usuarios.models import Usuario
 User = get_user_model()
 
 # Verificación para asegurarnos de que solo el personal/evaluador acceda
@@ -45,15 +46,15 @@ def lista_solicitudes_comite(request):
     HU-06: Muestra la lista de solicitudes. 
     Los Administradores ven todas; los Evaluadores ven solo las asignadas a ellos.
     """
-    if request.user.is_staff or request.user.is_superuser:
+    if request.user.is_staff or request.user.is_superuser or request.user.rol == 'ADMIN':
         # El Admin ve todo
         solicitudes = Solicitud.objects.all().select_related('estudiante', 'convocatoria', 'evaluador')
     else:
         # El Evaluador ve solo lo suyo
         solicitudes = Solicitud.objects.filter(evaluador=request.user).select_related('estudiante', 'convocatoria', 'evaluador')
     
-    # Consultar integrantes del comité (para el dropdown de asignación)
-    evaluadores = User.objects.filter(groups__name='ComiteEvaluador')
+    # Consultar integrantes del comité filtrando por el campo ROL del modelo
+    evaluadores = Usuario.objects.filter(rol=Usuario.Rol.EVALUADOR)
 
     return render(request, 'solicitudes/lista_comite.html', {
         'solicitudes': solicitudes,
