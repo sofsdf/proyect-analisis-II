@@ -133,15 +133,30 @@ STORAGES = {
 
 
 # Email configuration
+# MAILERS = {
+#     'default': {
+#         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+#     },
+# }
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
 LOGIN_URL = 'usuarios:login'
 LOGIN_REDIRECT_URL = 'convocatorias:catalogo'
 LOGOUT_REDIRECT_URL = 'usuarios:login'
+
+# Configuración de Correo Electrónico (Backend dinámico)
+
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Sistema de Becas <noreply@becas.com>')
+
+#confi de SMTP con mailtrap
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_HOST_USER = 'f6943730a362af'
+EMAIL_HOST_PASSWORD = '61d096fe013065'
+EMAIL_PORT = '2525'
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'Sistema de Becas <noreply@becas.com>'
+
+
