@@ -64,7 +64,7 @@
     </div>
     {% endif %}
 
-    <!-- NAVBAR SUPERIOR PARA MÓVILES (Visible únicamente en celulares < 768px) -->
+    <!-- NAVBAR SUPERIOR PARA MÓVILES -->
     <nav class="navbar navbar-dark bg-dark d-md-none px-3 border-bottom border-secondary">
         <a class="navbar-brand fw-bold fs-6" href="{% url 'convocatorias:catalogo' %}">
             <i class="bi bi-mortarboard-fill text-primary me-2"></i> Convocatorias
@@ -75,7 +75,7 @@
     </nav>
 
     <div class="wrapper">
-        <!-- Sidebar Lateral ESCRITORIO (Oculto en móvil) -->
+        <!-- Sidebar Lateral ESCRITORIO -->
         <nav id="sidebar" class="bg-dark text-white p-3 d-none d-md-flex flex-column justify-content-between">
             <div>
                 <a href="{% url 'convocatorias:catalogo' %}"
@@ -85,24 +85,24 @@
                 <hr class="text-secondary">
 
                 <ul class="nav nav-pills flex-column mb-auto">
-                    <!-- Menú Estudiante -->
+                    <!-- Menú Estudiante (O Modo Vista Previa) -->
+                    {% if not user.is_authenticated or user.rol == 'ESTUDIANTE' or request.session.modo_vista_estudiante %}
                     <li class="nav-item">
                         <a href="{% url 'convocatorias:catalogo' %}" class="nav-link text-white">
                             <i class="bi bi-journal-bookmark-fill me-2"></i> Catálogo Beca
                         </a>
                     </li>
-                    {% if user.is_authenticated and not user.is_staff %}
+                    {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a href="{% url 'solicitudes:mis_solicitudes' %}" class="nav-link text-white">
                             <i class="bi bi-file-earmark-person me-2"></i> Mis Solicitudes
                         </a>
                     </li>
                     {% endif %}
+                    {% endif %}
 
                     <!-- Menú Exclusivo Evaluador -->
-                    {% if user.is_authenticated %}
-                    {% for group in user.groups.all %}
-                    {% if group.name == 'ComiteEvaluador' %}
+                    {% if user.is_authenticated and user.rol == 'EVALUADOR' and not request.session.modo_vista_estudiante %}
                     <li class="text-secondary small fw-bold text-uppercase px-2 mt-3 mb-1">Comité</li>
                     <li>
                         <a href="{% url 'solicitudes:lista_solicitudes_comite' %}" class="nav-link text-white">
@@ -110,11 +110,10 @@
                         </a>
                     </li>
                     {% endif %}
-                    {% endfor %}
-                    {% endif %}
 
                     <!-- Menú Exclusivo Administrador/DBA -->
-                    {% if user.is_staff and not request.session.modo_vista_estudiante %}
+                    {% if user.is_authenticated and not request.session.modo_vista_estudiante %}
+                    {% if user.is_staff or user.is_superuser or user.rol == 'ADMIN' %}
                     <li class="text-secondary small fw-bold text-uppercase px-2 mt-3 mb-1">Administración</li>
                     <li>
                         <a href="{% url 'solicitudes:reportes' %}" class="nav-link text-white">
@@ -144,6 +143,7 @@
                         </a>
                     </li>
                     {% endif %}
+                    {% endif %}
                 </ul>
             </div>
 
@@ -151,7 +151,7 @@
             <div>
                 <hr class="text-secondary">
                 {% if user.is_authenticated %}
-                {% if user.is_staff %}
+                {% if user.is_staff or user.rol == 'ADMIN' %}
                 <div class="mb-2">
                     {% if request.session.modo_vista_estudiante %}
                     <a href="{% url 'usuarios:alternar_vista_previa' %}" class="btn btn-outline-warning btn-sm w-100">
@@ -195,22 +195,24 @@
             <div class="offcanvas-body d-flex flex-column justify-content-between">
                 <div>
                     <ul class="nav nav-pills flex-column mb-auto">
+                        <!-- Menú Estudiante (Móvil) -->
+                        {% if not user.is_authenticated or user.rol == 'ESTUDIANTE' or request.session.modo_vista_estudiante %}
                         <li class="nav-item">
                             <a href="{% url 'convocatorias:catalogo' %}" class="nav-link text-white">
                                 <i class="bi bi-journal-bookmark-fill me-2"></i> Catálogo Beca
                             </a>
                         </li>
-                        {% if user.is_authenticated and not user.is_staff %}
+                        {% if user.is_authenticated %}
                         <li class="nav-item">
                             <a href="{% url 'solicitudes:mis_solicitudes' %}" class="nav-link text-white">
                                 <i class="bi bi-file-earmark-person me-2"></i> Mis Solicitudes
                             </a>
                         </li>
                         {% endif %}
+                        {% endif %}
 
-                        {% if user.is_authenticated %}
-                        {% for group in user.groups.all %}
-                        {% if group.name == 'ComiteEvaluador' %}
+                        <!-- Menú Exclusivo Evaluador (Móvil) -->
+                        {% if user.is_authenticated and user.rol == 'EVALUADOR' and not request.session.modo_vista_estudiante %}
                         <li class="text-secondary small fw-bold text-uppercase px-2 mt-3 mb-1">Comité</li>
                         <li>
                             <a href="{% url 'solicitudes:lista_solicitudes_comite' %}" class="nav-link text-white">
@@ -218,10 +220,10 @@
                             </a>
                         </li>
                         {% endif %}
-                        {% endfor %}
-                        {% endif %}
 
-                        {% if user.is_staff and not request.session.modo_vista_estudiante %}
+                        <!-- Menú Exclusivo Administrador/DBA (Móvil) -->
+                        {% if user.is_authenticated and not request.session.modo_vista_estudiante %}
+                        {% if user.is_staff or user.is_superuser or user.rol == 'ADMIN' %}
                         <li class="text-secondary small fw-bold text-uppercase px-2 mt-3 mb-1">Administración</li>
                         <li>
                             <a href="{% url 'solicitudes:reportes' %}" class="nav-link text-white">
@@ -251,13 +253,14 @@
                             </a>
                         </li>
                         {% endif %}
+                        {% endif %}
                     </ul>
                 </div>
 
                 <div>
                     <hr class="text-secondary">
                     {% if user.is_authenticated %}
-                    {% if user.is_staff %}
+                    {% if user.is_staff or user.rol == 'ADMIN' %}
                     <div class="mb-2">
                         {% if request.session.modo_vista_estudiante %}
                         <a href="{% url 'usuarios:alternar_vista_previa' %}" class="btn btn-outline-warning btn-sm w-100">
