@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Verificación Requerida{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6 text-center">
+            
+            <div class="card border-0 shadow-lg rounded-4 p-4 p-sm-5">
+                <div class="mb-4">
+                    <span class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle p-3" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                        📩
+                    </span>
+                </div>
+
+                <h3 class="fw-bold text-dark mb-2">¡Cuenta creada con éxito!</h3>
+                <p class="text-muted mb-4">
+                    Hemos enviado un enlace de confirmación a tu correo electrónico. 
+                    Por favor revisa tu bandeja de entrada (o carpeta de spam) para activar tu perfil antes de iniciar sesión.
+                </p>
+
+                <div class="d-grid gap-2">
+                    <a href="{% url 'usuarios:login' %}" class="btn btn-outline-primary rounded-3 fw-semibold py-2">
+                        Ir al Inicio de Sesión
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

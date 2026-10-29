@@ -8,6 +8,7 @@ class Usuario(AbstractUser):
         EVALUADOR = 'EVALUADOR', 'Evaluador'
 
     email = models.EmailField('Correo electrónico', unique=True)
+    email_verificado = models.BooleanField(default=False, verbose_name="Correo Verificado")
     rol = models.CharField(
         max_length=20,
         choices=Rol.choices,

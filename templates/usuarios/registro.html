@@ -1,22 +1,51 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Registro de Estudiante</title>
-</head>
-<body>
-    <h2>Registro de Estudiantes</h2>
+{% extends 'base.html' %}
 
-    {% if messages %}
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    {% endif %}
+{% block title %}Registro de Estudiante{% endblock %}
 
-    <form method="post" novalidate>
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Registrarse</button>
-    </form>
-</body>
-</html>
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="bg-primary bg-gradient text-white text-center py-4 px-3">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-white text-primary rounded-circle shadow-sm mb-2" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                        
+                    </div>
+                    <h4 class="fw-bold mb-0">Crear Cuenta de Estudiante</h4>
+                    <p class="text-white-50 small mb-0">Ingresa tus datos para postular al catálogo de becas</p>
+                </div>
+
+                <div class="card-body p-4 p-sm-5">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-muted small mb-1">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <div class="form-text text-muted" style="font-size: 0.75rem;">{{ field.help_text }}</div>
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div class="text-danger small mt-1">{{ field.errors }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-3 fw-bold text-uppercase shadow-sm mt-3">
+                            Registrarse
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4 pt-2 border-top">
+                        <span class="text-muted small">¿Ya tienes una cuenta?</span>
+                        <a href="{% url 'usuarios:login' %}" class="fw-bold text-decoration-none ms-1">Iniciar Sesión</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
