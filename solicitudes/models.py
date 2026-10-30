@@ -124,3 +124,17 @@ class AuditoriaSolicitud(models.Model):
     def __str__(self):
         nombre_usuario = self.usuario.username if self.usuario else "Sistema"
         return f"{nombre_usuario} - {self.accion} ({self.fecha.strftime('%d/%m/%Y %H:%M')})"
+
+
+class Notificacion(models.Model):
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notificaciones')
+    solicitud = models.ForeignKey('Solicitud', on_delete=models.CASCADE, related_name='notificaciones', null=True, blank=True)
+    mensaje = models.TextField()
+    leida = models.BooleanField(default=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-fecha_creacion']
+
+    def __str__(self):
+        return f"Notificación para {self.usuario.username} - Leída: {self.leida}"

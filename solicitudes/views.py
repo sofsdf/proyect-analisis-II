@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from .models import Solicitud, AuditoriaSolicitud
 from .forms import SolicitudForm
 from .forms_resolucion import ResolucionForm  # HU-07
+from .models import Notificacion
 from convocatorias.models import Convocatoria
 from usuarios.models import Usuario
 
@@ -278,3 +279,8 @@ def dashboard_reportes(request):
         'rechazadas': rechazadas,
         'pendientes': pendientes
     })
+@login_required
+def marcar_notificaciones_leidas(request):
+    
+    Notificacion.objects.filter(usuario=request.user, leida=False).update(leida=True)
+    return redirect(request.META.get('HTTP_REFERER', 'solicitudes:mis_solicitudes'))
