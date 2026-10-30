@@ -13,5 +13,5 @@ urlpatterns = [
     path('resolver/<int:pk>/', views.resolver_solicitud, name='resolver_solicitud'),
     path('mis-solicitudes/', views.mis_solicitudes, name='mis_solicitudes'),
     path('reportes/', views.dashboard_reportes, name='reportes'),
+    path('notificaciones/marcar-leidas/', views.marcar_notificaciones_leidas, name='marcar_notificaciones_leidas'),
 ]
-
